@@ -1,0 +1,159 @@
+<!doctype html>
+<html lang="ru">
+  <head>
+    <meta charset="utf-8" />
+    <meta http-equiv="Content-Security-Policy" content="default-src 'self'; img-src 'self' data: file:; style-src 'self' 'unsafe-inline'" />
+    <title>prinSkrin — настройки</title>
+    <link rel="stylesheet" href="settings.css" />
+  </head>
+  <body>
+    <header class="app-header">
+      <img class="app-logo" src="../../../assets/icon.png" alt="prinSkrin" />
+      <div class="app-titles">
+        <h1>prinSkrin</h1>
+        <p>Скриншоты как в Lightshot: нажмите <kbd>PrtSc</kbd> — и выбирайте, что сохранить.</p>
+      </div>
+      <span class="app-version" id="appVersion"></span>
+    </header>
+
+    <main class="app-body">
+      <section class="card">
+        <div class="card-head">
+          <h2>Куда сохранять</h2>
+          <span class="card-note">Файлы складываются в эту папку автоматически</span>
+        </div>
+
+        <div class="row folder-row">
+          <input id="saveDir" class="text-input" type="text" spellcheck="false" />
+          <button class="btn ghost" id="browseBtn" type="button">Обзор…</button>
+          <button class="btn ghost" id="openFolderBtn" type="button">Открыть</button>
+        </div>
+
+        <label class="field">
+          <span class="field-label">Шаблон имени файла</span>
+          <input id="fileNamePattern" class="text-input" type="text" spellcheck="false" />
+        </label>
+        <div class="hint">
+          Доступны метки: <code>{yyyy}</code> <code>{MM}</code> <code>{dd}</code> <code>{HH}</code>
+          <code>{mm}</code> <code>{ss}</code> <code>{counter}</code>
+          <span class="preview">Пример: <b id="namePreview">—</b></span>
+        </div>
+
+        <div class="row format-row">
+          <div class="segmented" id="formatGroup">
+            <button type="button" data-format="png">PNG</button>
+            <button type="button" data-format="jpeg">JPEG</button>
+          </div>
+          <label class="quality" id="qualityWrap">
+            <span class="field-label">Качество JPEG</span>
+            <input id="jpegQuality" type="range" min="40" max="100" step="1" />
+            <output id="jpegQualityValue">92</output>
+          </label>
+        </div>
+      </section>
+
+      <section class="card">
+        <div class="card-head">
+          <h2>Захват экрана</h2>
+          <span class="card-note">Что происходит при нажатии горячей клавиши</span>
+        </div>
+
+        <div class="modes" id="modeGroup">
+          <button type="button" class="mode" data-mode="region">
+            <span class="mode-icon" data-icon="region"></span>
+            <span class="mode-title">Выделение</span>
+            <span class="mode-desc">Рамка мышью, по умолчанию</span>
+          </button>
+          <button type="button" class="mode" data-mode="screen">
+            <span class="mode-icon" data-icon="screen"></span>
+            <span class="mode-title">Весь экран</span>
+            <span class="mode-desc">Мгновенно, без вопросов</span>
+          </button>
+          <button type="button" class="mode" data-mode="window">
+            <span class="mode-icon" data-icon="window"></span>
+            <span class="mode-title">Окно</span>
+            <span class="mode-desc">Клик по нужному окну</span>
+          </button>
+          <button type="button" class="mode" data-mode="monitor">
+            <span class="mode-icon" data-icon="monitor"></span>
+            <span class="mode-title">Один дисплей</span>
+            <span class="mode-desc">Если мониторов несколько</span>
+          </button>
+        </div>
+
+        <div class="grid-2">
+          <label class="field">
+            <span class="field-label">Дисплей для режима «Один дисплей»</span>
+            <select id="monitorSelect" class="text-input"></select>
+          </label>
+
+          <label class="field">
+            <span class="field-label">Горячая клавиша</span>
+            <div class="hotkey-row">
+              <input id="hotkeyInput" class="text-input hotkey" type="text" readonly />
+              <button class="btn ghost" id="hotkeyReset" type="button" title="Сбросить на PrtSc">PrtSc</button>
+            </div>
+            <span class="hint" id="hotkeyHint">Нажмите на поле и введите сочетание. Esc — отмена.</span>
+          </label>
+        </div>
+
+        <div class="presets" id="hotkeyPresets">
+          <button type="button" class="chip" data-hotkey="PrintScreen">PrtSc</button>
+          <button type="button" class="chip" data-hotkey="Control+PrintScreen">Ctrl + PrtSc</button>
+          <button type="button" class="chip" data-hotkey="Alt+PrintScreen">Alt + PrtSc</button>
+          <button type="button" class="chip" data-hotkey="F8">F8</button>
+          <button type="button" class="chip" data-hotkey="Control+Shift+4">Ctrl + Shift + 4</button>
+        </div>
+
+        <label class="switch">
+          <input type="checkbox" id="autoSave" />
+          <span class="switch-box"></span>
+          <span class="switch-text">
+            Сохранять сразу после выделения — без панели инструментов
+          </span>
+        </label>
+      </section>
+
+      <section class="card">
+        <div class="card-head">
+          <h2>Поведение</h2>
+          <span class="card-note">Мелочи, которые делают работу удобной</span>
+        </div>
+
+        <label class="switch">
+          <input type="checkbox" id="copyToClipboard" />
+          <span class="switch-box"></span>
+          <span class="switch-text">Копировать скриншот в буфер обмена</span>
+        </label>
+
+        <label class="switch">
+          <input type="checkbox" id="notifications" />
+          <span class="switch-box"></span>
+          <span class="switch-text">Показывать уведомление после сохранения</span>
+        </label>
+
+        <label class="switch">
+          <input type="checkbox" id="launchAtLogin" />
+          <span class="switch-box"></span>
+          <span class="switch-text">Запускать prinSkrin при входе в Windows (в трее)</span>
+        </label>
+
+        <div class="tip">
+          <b>Совет.</b> Приложение живёт в трее. Закрытие этого окна не выключает захват —
+          для выхода используйте меню иконки в трее.
+        </div>
+      </section>
+    </main>
+
+    <footer class="app-footer">
+      <div class="status" id="status">Готово</div>
+      <div class="footer-actions">
+        <button class="btn ghost" id="resetBtn" type="button">Сбросить</button>
+        <button class="btn secondary" id="testBtn" type="button">Проверить захват</button>
+        <button class="btn primary" id="saveBtn" type="button">Сохранить</button>
+      </div>
+    </footer>
+
+    <script src="settings.js"></script>
+  </body>
+</html>

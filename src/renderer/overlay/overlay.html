@@ -1,0 +1,44 @@
+<!doctype html>
+<html lang="ru">
+  <head>
+    <meta charset="utf-8" />
+    <meta
+      http-equiv="Content-Security-Policy"
+      content="default-src 'self'; img-src 'self' data:; style-src 'self' 'unsafe-inline'"
+    />
+    <title>prinSkrin</title>
+    <link rel="stylesheet" href="overlay.css" />
+  </head>
+  <body>
+    <div id="shot"></div>
+    <div class="dim" id="dimTop"></div>
+    <div class="dim" id="dimLeft"></div>
+    <div class="dim" id="dimRight"></div>
+    <div class="dim" id="dimBottom"></div>
+
+    <div id="winHighlight">
+      <span id="winTitle"></span>
+    </div>
+
+    <div id="sel">
+      <span class="handle" data-h="nw"></span>
+      <span class="handle" data-h="n"></span>
+      <span class="handle" data-h="ne"></span>
+      <span class="handle" data-h="e"></span>
+      <span class="handle" data-h="se"></span>
+      <span class="handle" data-h="s"></span>
+      <span class="handle" data-h="sw"></span>
+      <span class="handle" data-h="w"></span>
+    </div>
+
+    <canvas id="ink"></canvas>
+
+    <div id="sizeBadge"></div>
+    <div id="toolbar"></div>
+    <div id="hint"></div>
+    <div id="passiveHint">Кликните здесь, чтобы выделить область на этом экране</div>
+    <div id="toast"></div>
+
+    <script src="overlay.js"></script>
+  </body>
+</html>

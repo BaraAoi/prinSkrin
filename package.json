@@ -1,0 +1,62 @@
+{
+  "name": "prinskrin",
+  "productName": "prinSkrin",
+  "version": "1.0.0",
+  "description": "prinSkrin — лёгкие скриншоты как в Lightshot: PrtSc, выделение, окно, весь экран или отдельный монитор.",
+  "author": "BaraAoi",
+  "license": "MIT",
+  "main": "src/main/main.js",
+  "scripts": {
+    "start": "electron .",
+    "start:capture": "electron . --capture",
+    "start:settings": "electron . --settings",
+    "check": "node scripts/check.js",
+    "pack:win": "node scripts/package-win.js",
+    "dist:win": "electron-builder --win --x64",
+    "dist:dir": "electron-builder --win --x64 --dir"
+  },
+  "devDependencies": {
+    "@electron/packager": "^18.4.2",
+    "electron": "^45.2.2",
+    "electron-builder": "^26.0.12"
+  },
+  "build": {
+    "appId": "com.prinskrin.app",
+    "productName": "prinSkrin",
+    "copyright": "prinSkrin",
+    "directories": {
+      "output": "release",
+      "buildResources": "assets"
+    },
+    "files": [
+      "src/**/*",
+      "assets/icon.png",
+      "assets/tray.png",
+      "package.json"
+    ],
+    "asar": true,
+    "win": {
+      "icon": "assets/icon.ico",
+      "target": [
+        {
+          "target": "nsis",
+          "arch": ["x64"]
+        }
+      ],
+      "legalTrademarks": "prinSkrin"
+    },
+    "nsis": {
+      "oneClick": false,
+      "perMachine": false,
+      "allowElevation": true,
+      "allowToChangeInstallationDirectory": true,
+      "createDesktopShortcut": "always",
+      "createStartMenuShortcut": true,
+      "shortcutName": "prinSkrin",
+      "runAfterFinish": true,
+      "deleteAppDataOnUninstall": false,
+      "artifactName": "prinSkrin-Setup-${version}.exe",
+      "uninstallDisplayName": "prinSkrin"
+    }
+  }
+}

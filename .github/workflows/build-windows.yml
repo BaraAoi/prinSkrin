@@ -1,0 +1,40 @@
+name: Build Windows app
+
+on:
+  workflow_dispatch:
+  push:
+    tags:
+      - 'v*'
+
+jobs:
+  build:
+    runs-on: windows-latest
+    defaults:
+      run:
+        shell: pwsh
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Setup Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: 22
+
+      - name: Install dependencies
+        run: npm install --no-audit --no-fund
+
+      - name: Check project
+        run: npm run check
+
+      - name: Build installer and portable exe
+        run: npx electron-builder --win nsis portable --x64 --publish never
+
+      - name: Upload artifacts
+        uses: actions/upload-artifact@v4
+        with:
+          name: prinSkrin-windows
+          path: |
+            release/*.exe
+          if-no-files-found: error
+          retention-days: 14
