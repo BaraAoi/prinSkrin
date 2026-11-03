@@ -200,6 +200,7 @@ function renderInk() {
   canvas.style.height = `${height}px`;
 
   const ctx = canvas.getContext('2d');
+  if (!ctx) return;
   ctx.setTransform(1, 0, 0, 1, 0, 0);
   ctx.clearRect(0, 0, canvas.width, canvas.height);
   ctx.setTransform(dpr, 0, 0, dpr, 0, 0);
@@ -1063,6 +1064,7 @@ async function composeDataURL(useShapes = true) {
   canvas.width = outW;
   canvas.height = outH;
   const ctx = canvas.getContext('2d');
+  if (!ctx) throw new Error('Canvas недоступен');
 
   if (state.image) {
     ctx.drawImage(state.image, sel.x * sx, sel.y * sy, sel.w * sx, sel.h * sy, 0, 0, outW, outH);
@@ -1179,7 +1181,12 @@ async function loadImage(dataURL) {
 }
 
 async function init() {
-  const data = await api.init();
+  const data = await api.init().catch((error) => {
+  console.error('[prinSkrin] overlay init:', error);
+  try {
+    api.cancel();
+  } catch { /* ignore */ }
+});
   if (!data || !data.display) {
     // Если данные не пришли — закрываемся, чтобы не блокировать экран.
     api.cancel();
@@ -1211,6 +1218,19 @@ async function init() {
   window.addEventListener('keydown', onKeyDown, true);
   window.addEventListener('contextmenu', (event) => event.preventDefault());
   window.addEventListener('resize', layout);
+
+  requestAnimationFrame(() => {
+    requestAnimationFrame(() => {
+      try {
+        api.ready();
+      } catch { /* ignore */ }
+    });
+  });
 }
 
-init();
+init().catch((error) => {
+  console.error('[prinSkrin] overlay init:', error);
+  try {
+    api.cancel();
+  } catch { /* ignore */ }
+});

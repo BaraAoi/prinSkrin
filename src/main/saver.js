@@ -114,14 +114,17 @@ async function saveDataURLAs(dataURL, parentWindow) {
   const image = imageFromDataURL(dataURL);
   const ext = settings.format === 'jpeg' ? 'jpg' : 'png';
   const suggested = buildPath(settings);
-  const result = await dialog.showSaveDialog(parentWindow || undefined, {
+  const options = {
     title: 'Сохранить скриншот',
     defaultPath: suggested,
     filters: [
       { name: ext === 'png' ? 'PNG изображение' : 'JPEG изображение', extensions: [ext] },
       { name: 'Все файлы', extensions: ['*'] },
     ],
-  });
+  };
+  const result = parentWindow
+    ? await dialog.showSaveDialog(parentWindow, options)
+    : await dialog.showSaveDialog(options);
   if (result.canceled || !result.filePath) return { canceled: true };
 
   const buffer = settings.format === 'jpeg' ? image.toJPEG(settings.jpegQuality) : image.toPNG();

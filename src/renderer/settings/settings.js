@@ -384,7 +384,10 @@ function bindEvents() {
   el('hotkeyInput').addEventListener('click', startHotkeyCapture);
 
   window.addEventListener('keydown', (event) => {
-    if (!state.capturingHotkey) return;
+    if (!state.capturingHotkey) {
+      if (document.activeElement === el('hotkeyInput') && event.key !== 'Escape') startHotkeyCapture();
+      return;
+    }
     event.preventDefault();
     event.stopPropagation();
 

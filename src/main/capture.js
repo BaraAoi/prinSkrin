@@ -10,23 +10,22 @@ const windowList = require('./windowList');
 let session = null;
 /** winId -> displayId */
 const overlayWindows = new Map();
+/** displayId -> resolve() ожидания первой отрисовки */
+const readyResolvers = new Map();
 let lastError = null;
 
 function displayCatalog() {
   const primary = screen.getPrimaryDisplay();
-  return screen
-    .getAllDisplays()
-    .map((display, index) => ({
-      id: String(display.id),
-      label: `Экран ${index + 1}`,
-      bounds: { ...display.bounds },
-      size: { ...display.size },
-      scaleFactor: display.scaleFactor,
-      primary: display.id === primary.id,
-      index,
-    }))
-    .sort((a, b) => a.index - b.index)
-    .map((display, index) => ({ ...display, label: `Экран ${index + 1}` }));
+  const raw = screen.getAllDisplays().map((display) => ({
+    id: String(display.id),
+    bounds: { ...display.bounds },
+    size: { ...display.size },
+    scaleFactor: display.scaleFactor,
+    primary: display.id === primary.id,
+  }));
+
+  raw.sort((a, b) => a.bounds.x - b.bounds.x || a.bounds.y - b.bounds.y);
+  return raw.map((display, index) => ({ ...display, index, label: `Экран ${index + 1}` }));
 }
 
 async function collectShots(displays) {
@@ -91,6 +90,7 @@ async function openOverlays({ displays, shots, mode, cursorId, settings }) {
   const overlayHtml = path.join(__dirname, '..', 'renderer', 'overlay', 'overlay.html');
 
   const loads = [];
+  const paints = [];
   for (const display of displays) {
     const win = new BrowserWindow({
       x: display.bounds.x,
@@ -138,9 +138,20 @@ async function openOverlays({ displays, shots, mode, cursorId, settings }) {
     win.webContents.on('render-process-gone', () => closeOverlays());
 
     loads.push(win.loadFile(overlayHtml));
+    paints.push(
+      new Promise((resolve) => {
+        readyResolvers.set(display.id, resolve);
+        setTimeout(resolve, 2000);
+      }),
+    );
   }
 
   await Promise.all(loads);
+  if (!session) return { ok: false, reason: 'closed' };
+
+  // Ждём, пока рендерер нарисует снимок экрана, чтобы не было мигания.
+  await Promise.race([Promise.all(paints), new Promise((resolve) => setTimeout(resolve, 2200))]);
+  readyResolvers.clear();
 
   if (!session) return { ok: false, reason: 'closed' };
 
@@ -244,6 +255,18 @@ function registerIpc() {
       },
       platform: process.platform,
     };
+  });
+
+  ipcMain.on('overlay:ready', (event) => {
+    const win = BrowserWindow.fromWebContents(event.sender);
+    if (!win) return;
+    const displayId = overlayWindows.get(win.id);
+    if (!displayId) return;
+    const resolve = readyResolvers.get(displayId);
+    if (resolve) {
+      readyResolvers.delete(displayId);
+      resolve();
+    }
   });
 
   ipcMain.handle('overlay:windows', (event) => {

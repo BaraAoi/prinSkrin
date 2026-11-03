@@ -105,7 +105,7 @@ $raw = [PrinSkrinWinEnum]::Collect()
 $result = @()
 foreach ($line in $raw.Split([char]10)) {
     if ([string]::IsNullOrWhiteSpace($line)) { continue }
-    $parts = $line.Split([char]'|', 7)
+    $parts = $line.Split([char[]]@('|'), 7)
     if ($parts.Count -lt 7) { continue }
     $result += [pscustomobject]@{
         hwnd   = $parts[0]
@@ -168,7 +168,7 @@ function listWindows({ maxAge = 600 } = {}) {
   running = new Promise((resolve) => {
     execFile(
       'powershell.exe',
-      ['-NoProfile', '-NonInteractive', '-ExecutionPolicy', 'Bypass', '-File', script],
+      ['-NoProfile', '-NonInteractive', '-NoLogo', '-ExecutionPolicy', 'Bypass', '-File', script],
       { windowsHide: true, timeout: 6000, maxBuffer: 8 * 1024 * 1024, encoding: 'utf8' },
       (error, stdout) => {
         running = null;

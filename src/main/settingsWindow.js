@@ -134,11 +134,14 @@ function registerIpc({ setHotkey, getHotkeyStatus }) {
   });
 
   ipcMain.handle('settings:browse', async () => {
-    const result = await dialog.showOpenDialog(settingsWin || undefined, {
+    const options = {
       title: 'Куда сохранять скриншоты',
       properties: ['openDirectory', 'createDirectory'],
       defaultPath: store.get().saveDir,
-    });
+    };
+    const result = settingsWin
+      ? await dialog.showOpenDialog(settingsWin, options)
+      : await dialog.showOpenDialog(options);
     if (result.canceled || !result.filePaths.length) return { ok: false };
     return { ok: true, path: result.filePaths[0] };
   });

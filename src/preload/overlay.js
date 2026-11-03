@@ -4,6 +4,7 @@ const { contextBridge, ipcRenderer } = require('electron');
 
 contextBridge.exposeInMainWorld('prinskrin', {
   init: () => ipcRenderer.invoke('overlay:init'),
+  ready: () => ipcRenderer.send('overlay:ready'),
   windows: () => ipcRenderer.invoke('overlay:windows'),
   save: (dataURL) => ipcRenderer.invoke('overlay:save', dataURL),
   saveAs: (dataURL) => ipcRenderer.invoke('overlay:save-as', dataURL),

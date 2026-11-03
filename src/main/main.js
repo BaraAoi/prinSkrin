@@ -107,9 +107,9 @@ function isSilentLaunch(flags) {
 
 function bootstrap() {
   app.setAppUserModelId(APP_ID);
-  Menu.setApplicationMenu(null);
 
   app.whenReady().then(() => {
+    Menu.setApplicationMenu(null);
     store.load();
     saver.ensureSaveDir();
 
